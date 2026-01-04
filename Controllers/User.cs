@@ -13,7 +13,7 @@ public class UserController(Context context) : ControllerBase
     private readonly Context Context = context;
    
     [HttpGet]
-    public async Task<IActionResult> GetUser()
+    public async Task<IActionResult> Get()
     {
         var Users = await Context.Users.Select(user => new{user.ID,user.Email,user.Name}).ToListAsync();
        
@@ -23,7 +23,7 @@ public class UserController(Context context) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostUser([FromBody] User user)
+    public async Task<IActionResult> Post([FromBody] User user)
     {
         var FindUser = await Context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
         if (FindUser != null)
@@ -42,7 +42,7 @@ public class UserController(Context context) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> PutUser([FromBody] UpdateUser data)
+    public async Task<IActionResult> Put([FromBody] UpdateUser data)
     {
         var user = await Context.Users.FindAsync(data.ID);
         if (user == null)
@@ -67,6 +67,19 @@ public class UserController(Context context) : ControllerBase
         await Context.SaveChangesAsync();
         return NoContent();
 
+    }
+
+    [HttpDelete("{ID}")]
+    public async Task<IActionResult> Delete(int ID)
+    {
+        var user = await Context.Users.FindAsync(ID);
+        if (user == null)
+        {
+            return Unauthorized("Usuaŕio não existe");
+        }
+        Context.Users.Remove(user);
+        await Context.SaveChangesAsync();
+        return NoContent();
     }
     
 }
